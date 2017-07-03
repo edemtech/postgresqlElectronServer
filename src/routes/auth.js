@@ -36,6 +36,7 @@ router.post('/', (req, res) => {
           jasminPass: user.get('jasminPass')
         }, config.jwtSecret);
         res.json({ token });
+        console.log('User ', identifier,' entered');
       } else {
         res.status(401).json({ errors: { form: 'Invalid Credentials' } });
       }
