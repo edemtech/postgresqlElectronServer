@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import isEmpty from 'lodash/isEmpty';
 
 import User from '../models/user';
+import Users from '../collections/users';
 
 let router = express.Router();
 
@@ -28,6 +29,20 @@ function validateInput(data, otherValidations) {
   })
 }
 
+//MAIN API
+// fetch all users
+router.get('/', (req, res) => {
+  Users.forge()
+    .fetch()
+    .then( (collection) => {
+      res.json({error: false, data: collection.toJSON()});
+    })
+    .catch( (err) => {
+      res.status(500).json({error: true, data: {message: err.message}});
+    });
+});
+
+// fetch exact person
 router.get('/:identifier', (req, res) => {
   User.query({
     select: [ 'username', 'email' ],
@@ -38,27 +53,37 @@ router.get('/:identifier', (req, res) => {
   });
 });
 
-// router.delete('/:identifier', (req, res) => {
-//   User.remove({
-//     username: req.params.identifier
-//   }, (err, bear) => {
-//     if (err)
-//       res.send(err);
-//
-//     res.json({ message: 'Deleted.'});
-//   })
-// })
+//update person
+router.put('/:identifier', (req, res) => {
+  User.forge({username: req.params.identifier})
+  .fetch({require: true})
+  .then(function (user) {
+    user.save({
+      username: req.body.username
+      // email: req.body.email || user.get('email')
+    })
+    .then(function () {
+      res.json({error: false, data: {message: 'User details updated'}});
+    })
+    .catch(function (err) {
+      res.status(500).json({error: true, data: {message: err.message}});
+    });
+  })
+  .catch(function (err) {
+    res.status(500).json({error: true, data: {message: err.message}});
+  });
+})
 
-// delete a user
+//remove person
 router.delete('/:identifier', (req, res) => {
   User.forge({username: req.params.identifier})
     .fetch({require: true})
     .then( (user) => {
       user.destroy()
-        .then(function () {
+        .then( () => {
           res.json({error: true, data: {message: 'User successfully deleted'}});
         })
-        .catch(function (err) {
+        .catch( (err) => {
           res.status(500).json({error: true, data: {message: err.message}});
         });
   })
@@ -67,6 +92,7 @@ router.delete('/:identifier', (req, res) => {
   });
 });
 
+//create person
 router.post('/', (req, res) => {
   validateInput(req.body, commonValidations).then(({ errors, isValid }) => {
     if (isValid) {
