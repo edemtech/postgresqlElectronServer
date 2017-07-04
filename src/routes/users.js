@@ -9,7 +9,6 @@ let router = express.Router();
 
 function validateInput(data, otherValidations) {
   let { errors } = otherValidations(data);
-
   return User.query({
     where: { email: data.email },
     orWhere: { username: data.username }
@@ -22,7 +21,6 @@ function validateInput(data, otherValidations) {
         errors.email = 'Электронная почта занята';
       }
     }
-
     return {
       errors,
       isValid: isEmpty(errors)
@@ -40,13 +38,42 @@ router.get('/:identifier', (req, res) => {
   });
 });
 
+// router.delete('/:identifier', (req, res) => {
+//   User.remove({
+//     username: req.params.identifier
+//   }, (err, bear) => {
+//     if (err)
+//       res.send(err);
+//
+//     res.json({ message: 'Deleted.'});
+//   })
+// })
+
+// delete a user
+router.delete('/:identifier', (req, res) => {
+  User.forge({username: req.params.identifier})
+    .fetch({require: true})
+    .then( (user) => {
+      user.destroy()
+        .then(function () {
+          res.json({error: true, data: {message: 'User successfully deleted'}});
+        })
+        .catch(function (err) {
+          res.status(500).json({error: true, data: {message: err.message}});
+        });
+  })
+  .catch(function (err) {
+    res.status(500).json({error: true, data: {message: err.message}});
+  });
+});
+
 router.post('/', (req, res) => {
   validateInput(req.body, commonValidations).then(({ errors, isValid }) => {
     if (isValid) {
-      const { 
-        username, 
-        password, 
-        permission, 
+      const {
+        username,
+        password,
+        permission,
         email,
         camcon, camconPass,
         streamate, streamatePass,
@@ -56,13 +83,13 @@ router.post('/', (req, res) => {
         f4f, f4fPass,
         jasmin, jasminPass
        } = req.body;
-       
+
       const password_digest = bcrypt.hashSync(password, 10);
 
       User.forge({
-        username, 
-        permission, 
-        email, 
+        username,
+        permission,
+        email,
         password_digest,
         camcon, camconPass,
         streamate, streamatePass,
