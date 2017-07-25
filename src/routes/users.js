@@ -45,7 +45,24 @@ router.get('/', (req, res) => {
 // fetch exact person
 router.get('/:identifier', (req, res) => {
   User.query({
-    select: [ 'username', 'email' ],
+    select: [ 'username', 
+              'email', 
+              'permission', 
+              'camcon',
+              'camconPass',
+              'streamate',
+              'streamatePass',
+              'streamray',
+              'streamrayPass',
+              'imlive',
+              'imlivePass',
+              'mfc',
+              'mfcPass',
+              'f4f',
+              'f4fPass',
+              'jasmin',
+              'jasminPass',
+            ],
     where: { email: req.params.identifier },
     orWhere: { username: req.params.identifier }
   }).fetch().then(user => {
