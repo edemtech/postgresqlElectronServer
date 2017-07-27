@@ -76,8 +76,23 @@ router.put('/:identifier', (req, res) => {
   .fetch({require: true})
   .then(function (user) {
     user.save({
-      username: req.body.username
-      // email: req.body.email || user.get('email')
+      username: req.body.username,
+      email: req.body.email,
+      permission: req.body.permission,
+      camcon: req.body.camcon,
+      camconPass: req.body.camconPass,
+      streamate: req.body.streamate,
+      streamatePass: req.body.streamatePass,
+      streamray: req.body.streamray,
+      streamrayPass: req.body.streamrayPass,
+      imlive: req.body.imlive,
+      imlivePass: req.body.imlivePass,
+      mfc: req.body.mfc,
+      mfcPass: req.body.mfcPass,
+      f4f: req.body.f4f,
+      f4fPass: req.body.f4fPass,
+      jasmin: req.body.jasmin,
+      jasminPass: req.body.jasminPass
     })
     .then(function () {
       res.json({error: false, data: {message: 'User details updated'}});
