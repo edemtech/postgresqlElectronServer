@@ -45,9 +45,9 @@ router.get('/', (req, res) => {
 // fetch exact person
 router.get('/:identifier', (req, res) => {
   User.query({
-    select: [ 'username', 
-              'email', 
-              'permission', 
+    select: [ 'username',
+              'email',
+              'permission',
               'camcon',
               'camconPass',
               'streamate',
@@ -78,6 +78,7 @@ router.put('/:identifier', (req, res) => {
     user.save({
       username: req.body.username,
       email: req.body.email,
+      password_digest: bcrypt.hashSync(req.body.password, 10),
       permission: req.body.permission,
       camcon: req.body.camcon,
       camconPass: req.body.camconPass,
